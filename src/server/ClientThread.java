@@ -40,6 +40,7 @@ public class ClientThread extends Thread {
             }
         } catch (IOException e) {
             System.err.println("Lost connection with client: " + clientNick);
+            clientThreads.remove(this);
         }
     }
 }

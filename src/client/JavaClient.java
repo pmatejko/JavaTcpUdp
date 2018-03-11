@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.List;
 
 public class JavaClient {
     private final String HOST_NAME = "localhost";
@@ -17,37 +18,24 @@ public class JavaClient {
 
 
     public void start() throws IOException, InterruptedException {
-        Socket socket = null;
-        DatagramSocket datagramSocket = null;
-        MulticastSocket multicastSocket = null;
 
-        try {
-            socket = new Socket(HOST_NAME, SERVER_PORT_NUMBER);
-            datagramSocket = new DatagramSocket(socket.getLocalPort());
-            multicastSocket = new MulticastSocket(MULTICAST_PORT_NUMBER);
+        try (
+            Socket socket = new Socket(HOST_NAME, SERVER_PORT_NUMBER);
+            DatagramSocket datagramSocket = new DatagramSocket(socket.getLocalPort());
+            MulticastSocket multicastSocket = new MulticastSocket(MULTICAST_PORT_NUMBER);
+        ) {
             multicastSocket.joinGroup(MULTICAST_GROUP);
 
-            WriterThread writerThread = new WriterThread(socket, datagramSocket, multicastSocket, MULTICAST_GROUP);
-            TcpThread tcpThread = new TcpThread(socket);
-            UdpThread udpThread = new UdpThread(datagramSocket);
-            MulticastThread multicastThread = new MulticastThread(multicastSocket);
+            List<Thread> threads = List.of(new WriterThread(socket, datagramSocket, multicastSocket, MULTICAST_GROUP),
+                    new TcpThread(socket), new UdpThread(datagramSocket), new MulticastThread(multicastSocket));
 
-            writerThread.start();
-            tcpThread.start();
-            udpThread.start();
-            multicastThread.start();
+            for (Thread thread : threads) {
+                thread.start();
+            }
 
-            writerThread.join();
-            tcpThread.join();
-            udpThread.join();
-            multicastThread.join();
-        } finally {
-            if (socket != null)
-                socket.close();
-            if (datagramSocket != null)
-                datagramSocket.close();
-            if (multicastSocket != null)
-                multicastSocket.close();
+            for (Thread thread : threads) {
+                thread.join();
+            }
         }
     }
 

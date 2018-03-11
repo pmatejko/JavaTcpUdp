@@ -7,9 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class JavaServer {
     private static final int PORT_NUMBER = 12345;
-    private ServerSocket serverSocket;
-    private DatagramSocket datagramSocket;
-    private List<ClientThread> clientThreads;
+    private final List<ClientThread> clientThreads;
 
     public JavaServer() {
         System.out.println("JAVA SERVER");
@@ -17,24 +15,20 @@ public class JavaServer {
     }
 
     public void start() throws IOException, InterruptedException {
-        try {
-            serverSocket = new ServerSocket(PORT_NUMBER);
-            datagramSocket = new DatagramSocket(PORT_NUMBER);
-            System.out.println("Server created");
+        try (
+            ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
+            DatagramSocket datagramSocket = new DatagramSocket(PORT_NUMBER)
+        ) {
+            List<Thread> threads = List.of(new TcpThread(serverSocket, clientThreads),
+                    new UdpThread(datagramSocket, clientThreads));
 
-            TcpThread tcpThread = new TcpThread(serverSocket, clientThreads);
-            UdpThread udpThread = new UdpThread(datagramSocket, clientThreads);
+            for (Thread thread : threads) {
+                thread.start();
+            }
 
-            tcpThread.start();
-            udpThread.start();
-
-            tcpThread.join();
-            udpThread.join();
-        } finally {
-            if (serverSocket != null)
-                serverSocket.close();
-            if (datagramSocket != null)
-                datagramSocket.close();
+            for (Thread thread : threads) {
+                thread.join();
+            }
         }
     }
 
