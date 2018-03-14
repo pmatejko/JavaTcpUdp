@@ -22,7 +22,7 @@ public class UdpThread extends Thread {
             datagramSocket.receive(receivePacket);
 
             String msg = new String(receivePacket.getData());
-            System.out.println("received udp msg:\n" + msg);
+            System.out.println("     " + msg);
         } catch (IOException e) {
             e.printStackTrace();
         }

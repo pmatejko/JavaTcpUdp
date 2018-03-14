@@ -1,5 +1,8 @@
 package server;
 
+import server.dto.Client;
+import server.dto.Message;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.List;
@@ -22,9 +25,9 @@ public class JavaServer {
             DatagramSocket datagramSocket = new DatagramSocket(PORT_NUMBER)
         ) {
             ExecutorService executorService = Executors.newFixedThreadPool(4);
-            List<Thread> threads = List.of(new TcpAcceptThread(serverSocket, executorService, clients, messageQueue),
-                    new TcpSenderThread(clients, messageQueue),
-                    new UdpThread(datagramSocket, clients));
+            List<Thread> threads = List.of(new TcpThread(serverSocket, executorService, clients, messageQueue),
+                    new UdpThread(datagramSocket, clients, messageQueue),
+                    new SenderThread(datagramSocket, clients, messageQueue));
 
             for (Thread thread : threads) {
                 thread.start();

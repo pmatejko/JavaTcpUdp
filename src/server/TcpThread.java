@@ -1,5 +1,8 @@
 package server;
 
+import server.dto.Client;
+import server.dto.Message;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,14 +10,14 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
-public class TcpAcceptThread extends Thread {
+public class TcpThread extends Thread {
     private final ServerSocket serverSocket;
     private final ExecutorService executorService;
     private final List<Client> clients;
     private final BlockingQueue<Message> messageQueue;
 
-    public TcpAcceptThread(ServerSocket serverSocket, ExecutorService executorService,
-                           List<Client> clients, BlockingQueue<Message> messageQueue) {
+    public TcpThread(ServerSocket serverSocket, ExecutorService executorService,
+                     List<Client> clients, BlockingQueue<Message> messageQueue) {
         this.serverSocket = serverSocket;
         this.executorService = executorService;
         this.clients = clients;

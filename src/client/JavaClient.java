@@ -25,7 +25,7 @@ public class JavaClient {
         ) {
             multicastSocket.joinGroup(MULTICAST_GROUP);
 
-            List<Thread> threads = List.of(new WriterThread(socket, datagramSocket, multicastSocket, MULTICAST_GROUP),
+            List<Thread> threads = List.of(new SenderThread(socket, datagramSocket, multicastSocket, MULTICAST_GROUP),
                     new TcpThread(socket), new UdpThread(datagramSocket), new MulticastThread(multicastSocket));
 
             for (Thread thread : threads) {

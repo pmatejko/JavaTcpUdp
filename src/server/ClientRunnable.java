@@ -1,5 +1,9 @@
 package server;
 
+import server.dto.Client;
+import server.dto.Message;
+import server.dto.Protocol;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
@@ -23,8 +27,9 @@ public class ClientRunnable implements Runnable {
             client.setNickname(in.readLine());
 
             while (true) {
-                String msg = in.readLine();
-                messageQueue.add(new Message(client, msg));
+                String content = in.readLine();
+                Message message = new Message(client, content, Protocol.TCP);
+                messageQueue.add(message);
             }
         } catch (IOException e) {
             System.err.println("Lost connection with client: " + client.getNickname());
