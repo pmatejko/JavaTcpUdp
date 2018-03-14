@@ -9,11 +9,11 @@ import java.util.List;
 
 public class UdpThread extends Thread {
     private final DatagramSocket datagramSocket;
-    private final List<ClientThread> clientThreads;
+    private final List<Client> clients;
 
-    public UdpThread(DatagramSocket datagramSocket, List<ClientThread> clientThreads) {
+    public UdpThread(DatagramSocket datagramSocket, List<Client> clients) {
         this.datagramSocket = datagramSocket;
-        this.clientThreads = clientThreads;
+        this.clients = clients;
     }
 
     @Override
@@ -32,9 +32,9 @@ public class UdpThread extends Thread {
                 byte[] sendBuffer = msg.getBytes();
                 System.out.println("received udp msg:\n" + msg);
 
-                for (ClientThread clientThread : clientThreads) {
-                    InetAddress clientAddress = clientThread.getInetAddress();
-                    int clientPort = clientThread.getPort();
+                for (Client client : clients) {
+                    InetAddress clientAddress = client.getInetAddress();
+                    int clientPort = client.getPort();
 
                     if (senderPort != clientPort || !senderAddress.equals(clientAddress)) {
                         DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, clientAddress, clientPort);

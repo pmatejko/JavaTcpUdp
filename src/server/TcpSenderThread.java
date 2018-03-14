@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class TcpSenderThread extends Thread {
-    private final List<ClientThread> clientThreads;
+    private final List<Client> clients;
     private final BlockingQueue<Message> messageQueue;
 
-    public TcpSenderThread(List<ClientThread> clientThreads, BlockingQueue<Message> messageQueue) {
-        this.clientThreads = clientThreads;
+    public TcpSenderThread(List<Client> clients, BlockingQueue<Message> messageQueue) {
+        this.clients = clients;
         this.messageQueue = messageQueue;
     }
 
@@ -16,13 +16,13 @@ public class TcpSenderThread extends Thread {
     public void run() {
         while (true) try {
             Message message = messageQueue.take();
-            ClientThread authorThread = message.getAuthor();
-            String messageString = authorThread.getNickname() + ": " + message.getContent();
+            Client author = message.getAuthor();
+            String messageString = author.getNickname() + ": " + message.getContent();
             System.out.println(messageString);
 
-            for (ClientThread clientThread : clientThreads) {
-                if (clientThread != authorThread) {
-                    clientThread.getPrintWriter()
+            for (Client client : clients) {
+                if (client != author) {
+                    client.getPrintWriter()
                             .println(messageString);
                 }
             }
@@ -30,4 +30,5 @@ public class TcpSenderThread extends Thread {
             e.printStackTrace();
         }
     }
+
 }

@@ -5,16 +5,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 public class TcpAcceptThread extends Thread {
     private final ServerSocket serverSocket;
-    private final List<ClientThread> clientThreads;
+    private final ExecutorService executorService;
+    private final List<Client> clients;
     private final BlockingQueue<Message> messageQueue;
 
-    public TcpAcceptThread(ServerSocket serverSocket, List<ClientThread> clientThreads,
-                           BlockingQueue<Message> messageQueue) {
+    public TcpAcceptThread(ServerSocket serverSocket, ExecutorService executorService,
+                           List<Client> clients, BlockingQueue<Message> messageQueue) {
         this.serverSocket = serverSocket;
-        this.clientThreads = clientThreads;
+        this.executorService = executorService;
+        this.clients = clients;
         this.messageQueue = messageQueue;
     }
 
@@ -24,9 +27,11 @@ public class TcpAcceptThread extends Thread {
             Socket clientSocket = serverSocket.accept();
             System.out.println("Accepted client");
 
-            ClientThread clientThread = new ClientThread(clientSocket, messageQueue);
-            clientThread.start();
-            clientThreads.add(clientThread);
+            Client client = new Client(clientSocket);
+            ClientRunnable clientRunnable = new ClientRunnable(client, clients, messageQueue);
+
+            executorService.submit(clientRunnable);
+            clients.add(client);
         } catch (IOException e) {
             e.printStackTrace();
         }

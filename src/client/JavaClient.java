@@ -18,7 +18,6 @@ public class JavaClient {
 
 
     public void start() throws IOException, InterruptedException {
-
         try (
             Socket socket = new Socket(HOST_NAME, SERVER_PORT_NUMBER);
             DatagramSocket datagramSocket = new DatagramSocket(socket.getLocalPort());
