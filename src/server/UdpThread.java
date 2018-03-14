@@ -33,8 +33,8 @@ public class UdpThread extends Thread {
                 System.out.println("received udp msg:\n" + msg);
 
                 for (ClientThread clientThread : clientThreads) {
-                    InetAddress clientAddress = clientThread.getClientSocket().getInetAddress();
-                    int clientPort = clientThread.getClientSocket().getPort();
+                    InetAddress clientAddress = clientThread.getInetAddress();
+                    int clientPort = clientThread.getPort();
 
                     if (senderPort != clientPort || !senderAddress.equals(clientAddress)) {
                         DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, clientAddress, clientPort);
